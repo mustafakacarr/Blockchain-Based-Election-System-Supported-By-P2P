@@ -25,8 +25,7 @@ public class SecurityConfig  {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/startup-report/**",
-            "/votes/**",
-            "/**",
+      
     };
 
     public SecurityConfig(PasswordEncoder passwordEncoder, JwtAuthFilter jwtAuthFilter, UserDetailsServiceImpl userDetailsService) {
@@ -42,8 +41,11 @@ public class SecurityConfig  {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(x ->
                         x.requestMatchers( "/auth/login/**").permitAll()
-                                .requestMatchers("/chain/**").permitAll()
                                 .requestMatchers("/ws/**").permitAll() //WebSocket
+                                .requestMatchers("/chain/**").hasAnyRole("VOTER", "ELECTION_MANAGER")
+                                .requestMatchers("/users/**").hasRole("ELECTION_MANAGER")
+                                .requestMatchers("/candidates/**").hasAnyRole("VOTER", "ELECTION_MANAGER")
+                                .requestMatchers("/votes/**").hasRole("VOTER")
                                 .requestMatchers(AUTH_WHITELIST).permitAll()
                               .anyRequest().authenticated())
                 .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

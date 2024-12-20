@@ -26,8 +26,8 @@ public class VoteController {
     }
 
     @GetMapping("/check")
-    public ResponseEntity<Boolean> checkIfUsedRightOfVote(@RequestParam String voterHash) {
-        return ResponseEntity.ok(voteService.checkIfUserUsedVoteRight(voterHash));
+    public ResponseEntity<Boolean> checkIfUsedRightOfVote(@RequestHeader (name="Authorization") String token) {
+        return ResponseEntity.ok(voteService.checkIfUserUsedVoteRight(token));
     }
 
 }

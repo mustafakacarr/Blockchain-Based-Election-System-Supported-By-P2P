@@ -21,19 +21,21 @@ public class VoteService {
     private final CandidateService candidateService;
     private final UserRepository userRepository;
     private final BlockchainWebSocketHandler blockchainWebSocketHandler;
+    private final JwtService jwtService;
 
-    public VoteService(Chain chain, CandidateService candidateService, UserRepository userRepository, BlockchainWebSocketHandler blockchainWebSocketHandler) {
+    public VoteService(Chain chain, CandidateService candidateService, UserRepository userRepository, BlockchainWebSocketHandler blockchainWebSocketHandler, JwtService jwtService) {
         this.chain = chain;
         this.candidateService = candidateService;
         this.userRepository = userRepository;
         this.blockchainWebSocketHandler = blockchainWebSocketHandler;
+        this.jwtService = jwtService;
     }
 
     public ResponseEntity<String> vote(CastVoteRequest addBlockRequest) throws Exception {
         if (userRepository.findByUsername(addBlockRequest.voterHash()) == null) {
             return ResponseEntity.badRequest().body("Voter not found! Rigging attempt detected!");
         }
-        if (checkIfUserUsedVoteRight(addBlockRequest.voterHash())) {
+        if (checkIfUserUsedVoteRightByChain(addBlockRequest.voterHash())) {
             return ResponseEntity.badRequest().body("Double-Spending Attempt! You have already voted. ");
         } else {
             chain.addBlock(addBlockRequest.voterHash(), addBlockRequest.votedTo());
@@ -42,7 +44,13 @@ public class VoteService {
         return ResponseEntity.ok("Block added");
     }
 
-    public boolean checkIfUserUsedVoteRight(String voterHash) {
+    public boolean checkIfUserUsedVoteRight(String token) {
+        String voterHash = jwtService.extractUsername(token.substring("Bearer ".length()));
+        return checkIfUserUsedVoteRightByChain(voterHash);
+
+    }
+
+    public boolean checkIfUserUsedVoteRightByChain(String voterHash) {
         return chain.hasVoterAlreadyVoted(voterHash);
     }
 
