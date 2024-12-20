@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: vfy_postgres
+    environment:
+      POSTGRES_DB: votify
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 123
+    ports:
+      - "1225:5432"
