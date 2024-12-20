@@ -45,7 +45,7 @@ public class SecurityConfig  {
                                 .requestMatchers("/chain/**").hasAnyRole("VOTER", "ELECTION_MANAGER")
                                 .requestMatchers("/users/**").hasRole("ELECTION_MANAGER")
                                 .requestMatchers("/candidates/**").hasAnyRole("VOTER", "ELECTION_MANAGER")
-                                .requestMatchers("/votes/**").hasRole("VOTER")
+                                .requestMatchers("/votes/**").hasAnyRole("VOTER", "ELECTION_MANAGER")
                                 .requestMatchers(AUTH_WHITELIST).permitAll()
                               .anyRequest().authenticated())
                 .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
